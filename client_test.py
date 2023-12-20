@@ -190,11 +190,72 @@ class Home_Window(Window):
         welcome_text = f"Welcome {self.user.username}"
         self.label = tk.Label(self.win_root, text=welcome_text, font=("Arial",22))
         self.widget_array.append(self.label)
+        self.search_entry = ctk.CTkEntry(self.win_root, placeholder_text="Search for contacts")
+        self.widget_array.append(self.search_entry)
+        self.search_btn = ctk.CTkButton(self.win_root, width=30,height=30,corner_radius=15, fg_color="#666666" ,text="",command=self.Search_for_contacts)
+        self.widget_array.append(self.search_btn)
+        self.contact_found_state = 0
+        self.create_home_window()
+        
+        
+    def create_home_window(self):
+        selecter_user = self.search_entry.get()
+        self.Mainframe = tk.Frame(self.win_root)
+        self.Mainframe.columnconfigure(0,weight=1)
+        self.Mainframe.columnconfigure(1,weight=1)
+        self.createLeftBlock()
+        self.createRightBlock(selecter_user)
+        
+    def createLeftBlock(self):
+        self.List_Contact = tk.Listbox(self.Mainframe)
+        for contact in self.user.contact_list:
+            self.List_Contact.insert(tk.END, contact)
+        self.List_Contact.grid(row=0, column=0)
+        
+        
+    def createRightBlock(self,selected_user_name: str | None):
+        if selected_user_name is not None:
+            if self.contact_found_state ==1:
+                self.Show_Contact_Info(selected_user_name)
+        
+    def Show_Contact_Info(self, username):
+       Contact = User(username, self.db_processor)
+       contact_Username_Label = tk.Label(self.Mainframe, text=f"@{Contact.username}", font=("Arial",22))
+       contact_name_Label = tk.Label(self.Mainframe, text=f"{Contact.nom} {Contact.prenom} ", font=("Arial",22))
+       add2contact_btn = ctk.CTkButton(self.Mainframe, width=30,height=30,corner_radius=15, fg_color="#666666" ,text="+",command=self.add_search_to_contacts)
+       contact_Username_Label.grid(row=0, column=1)
+       contact_name_Label.grid(row=1, column=1)
+       add2contact_btn.grid(row=2, column=1)
+
+       
+       
+    def add_search_to_contacts(self):
+        search_entry = self.search_entry.get()
+        self.user.add_to_contacts(self.db_processor, search_entry)
+        
+    def Search_for_contacts(self):
+        
+        search_input = self.search_entry.get()
+        if search_input != "" : 
+            self.db_processor.curseur.execute("SELECT * FROM Utilisateurs WHERE username = ?",(search_input,))
+            result = self.db_processor.curseur.fetchone()
+            if result is not None: 
+                messagebox.showinfo(title="!!!", message=f"{search_input} existe dans la db")
+                self.contact_found_state=1
+                
+            else:
+                messagebox.showinfo(title="...", message=f"{search_input} existe pas...")
+        else:
+            messagebox.showinfo(title="???", message="Il faut inserer quelque chose dans la barre de recherche :)")
+         
+            
+        
         
 
 
 def main():
-    window = welcome_window()
+    #window = welcome_window()
+    window = Home_Window("DeathStar")
     window.run()
     
     
