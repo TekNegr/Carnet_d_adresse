@@ -58,6 +58,10 @@ class login_Window(Window):
             msg_title = "????"
             message="All the fields must be filled before connecting"
         messagebox.showinfo(title=msg_title, message=message)
+        
+        
+    #def go_to_sign_up(self):
+        
     
         
    
@@ -125,17 +129,23 @@ class Home_Window(Window):
     def __init__(self):
         super().__init__()
         self.win_root.geometry("800x500")
-        #self.create_leftblock()
+        self.user = User()
+        self.label = tk.Label(self.win_root, text="CREATE AN ACCOUNT!!!!!", font=("Arial",22))
+        self.create_leftblock()
         #self.create_rightblock()
          
-    #def create_leftblock(self):
-        
+    def create_leftblock(self):
+        self.mainframe = tk.Frame()
         
     #def create_rightblock(self):
         
 
 
-window = login_Window()
-#window = SignUp_Window()
+
+def main():
+    
+
+#window = login_Window()
+window = SignUp_Window()
 
 window.run()

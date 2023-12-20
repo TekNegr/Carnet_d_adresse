@@ -1,7 +1,7 @@
 import sqlite3
 import json
 from sqlite3 import Error
-
+from tkinter import messagebox
 
 
 
@@ -24,7 +24,11 @@ class DB_Processor():
                 username TEXT,
                 nom TEXT,
                 prenom TEXT,
-                mot_de_passe TEXT
+                mot_de_passe TEXT,
+                email TEXT,
+                PDP_url TEXT,
+                contact_list JSON
+                
             )
         ''')
             self.connexion.commit()
@@ -70,6 +74,22 @@ class DB_Processor():
                 print("No users found")
         except Error as e:
             print(e)
+      
+      
+    #Recherche tous les contacts d'un utilisateur      
+    def fetch_contacts(self, username):
+        self.curseur.execute('SELECT contact_list FROM Utilisateurs WHERE username = ?',(username,))
+        result = self.curseur.fetchone()[0]
+        contact_list = json.loads(result)
+        return contact_list
+    
+    #update la liste des contacts
+    def update_contacts(self, username, contact_list):
+        self.curseur.execute('UPDATE Utilisateurs SET contact_list = ? WHERE username = ?',(contact_list, username))
+        self.connexion.commit()
+        print("Contacts updated succesfully")
+        
+        
 
 
     
@@ -82,6 +102,43 @@ class User():
         self.nom = user[2]
         self.prenom = user[3]
         self.mdp = user[4]
+        self.email = user[5]
+        self.pdp_url = user[6]
+        self.contact_list = db_Processor.fetch_contacts(self.username)
+        
+        
+    def show_contacts(self, db_Processor: DB_Processor):
+        for contact in self.contact_list:
+            db_Processor.curseur.execute("SELECT * FROM Utilisateurs WHERE username = ?",(contact,))
+            user = db_Processor.curseur.fetchone()
+            print(f"Contact : @{user[1]} {user[2]} {user[3]}")
+            
+    def add_to_contacts(self, db_Processor: DB_Processor, username):
+        if username not in self.contact_list:
+            self.contact_list.append(username)
+            db_Processor.update_contacts(self.username, self.contact_list)
+            msg_title = "Success"
+            message = "Contact added succesfully"
+        else:
+            msg_title ="oops"
+            message = "Contact already in the list"
+        messagebox.showinfo(title=msg_title, message=message)
+            
+    def remove_from_contacts(self, db_Processor : DB_Processor, username):
+        if username in self.contact_list:
+            self.contact_list.remove(username)
+            db_Processor.update_contacts(self.username, self.contact_list)
+            msg_title = "Success"
+            message = "Contact deleted succesfully"
+        else:
+            msg_title ="oops"
+            message = "Contact not in the list"
+            messagebox.showinfo(title=msg_title, message=message)
+            
+        
+        
+        
+    
         
 
 
