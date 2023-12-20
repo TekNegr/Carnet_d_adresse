@@ -37,11 +37,11 @@ class DB_Processor():
             print(e)
             
     # Fonction pour insérer un nouvel utilisateur - XAVIER
-    def insert_user(self,username, nom_utilisateur, prenom_utilisateur, mot_de_passe):
+    def insert_user(self,username, nom_utilisateur, prenom_utilisateur, mot_de_passe,email):
         try:
             self.curseur.execute('''
-                INSERT INTO Utilisateurs (username, nom, prenom, mot_de_passe) VALUES (?,?, ?, ?)
-            ''', (username,nom_utilisateur, prenom_utilisateur, mot_de_passe))
+                INSERT INTO Utilisateurs (username, nom, prenom, mot_de_passe,email) VALUES (?,?, ?, ?,?)
+            ''', (username,nom_utilisateur, prenom_utilisateur, mot_de_passe,email))
             self.connexion.commit()
             print(f"Utilisateur {prenom_utilisateur} {nom_utilisateur} : @{username} inséré avec succès.")
         except Error as e:
@@ -69,7 +69,7 @@ class DB_Processor():
             
             if user:
                 print("user found: ")
-                print(f"Username : {user[1]} - Nom : {user[2]} - Prenom : {user[3]} - MDP : {user[4]}")
+                print(f"Username : {user[1]} - Nom : {user[2]} - Prenom : {user[3]} - MDP : {user[4]} - EMAIL {user[5]}")
             else:
                 print("No users found")
         except Error as e:
@@ -80,7 +80,10 @@ class DB_Processor():
     def fetch_contacts(self, username):
         self.curseur.execute('SELECT contact_list FROM Utilisateurs WHERE username = ?',(username,))
         result = self.curseur.fetchone()[0]
-        contact_list = json.loads(result)
+        if result is not None:
+            contact_list = json.loads(result)
+        else : 
+            contact_list = []
         return contact_list
     
     #update la liste des contacts
@@ -97,7 +100,7 @@ class DB_Processor():
 class User():
     def __init__(self,username, db_Processor: DB_Processor):
         db_Processor.curseur.execute("SELECT * FROM Utilisateurs WHERE username = ?",(username,))
-        user = db_Processor.curseur.fetchone
+        user = db_Processor.curseur.fetchone()
         self.username = username
         self.nom = user[2]
         self.prenom = user[3]
@@ -106,12 +109,13 @@ class User():
         self.pdp_url = user[6]
         self.contact_list = db_Processor.fetch_contacts(self.username)
         
-        
+    #a tester    
     def show_contacts(self, db_Processor: DB_Processor):
         for contact in self.contact_list:
             db_Processor.curseur.execute("SELECT * FROM Utilisateurs WHERE username = ?",(contact,))
             user = db_Processor.curseur.fetchone()
             print(f"Contact : @{user[1]} {user[2]} {user[3]}")
+       
             
     def add_to_contacts(self, db_Processor: DB_Processor, username):
         if username not in self.contact_list:
