@@ -1,0 +1,13 @@
+Main Hub connection pour tous les fichiers - Fin X & H
+
+Fix showing contacts - Henin
+
+Affichage des contacts par les boutons de la liste - Henin
+
+verifier affichage liste - Henin
+
+Fix bouton de recherche - Xavier
+
+Faire Page Settings profil - Xavier
+
+ajouter (add/suppr) de contact_list- Henin

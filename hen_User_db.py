@@ -116,7 +116,7 @@ class User():
             user = db_Processor.curseur.fetchone()
             print(f"Contact : @{user[1]} {user[2]} {user[3]}")
        
-            
+    #a tester        
     def add_to_contacts(self, db_Processor: DB_Processor, username):
         if username not in self.contact_list:
             self.contact_list.append(username)
@@ -127,7 +127,8 @@ class User():
             msg_title ="oops"
             message = "Contact already in the list"
         messagebox.showinfo(title=msg_title, message=message)
-            
+     
+     #a tester       
     def remove_from_contacts(self, db_Processor : DB_Processor, username):
         if username in self.contact_list:
             self.contact_list.remove(username)
